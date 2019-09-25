@@ -9,6 +9,12 @@ from random import randrange
 
 def rel_error(x, y):
     """ returns relative error """
+    # print(f'x shape: {x.shape}')
+    # print(f'y shape: {y.shape}')
+    # diff_full = np.abs(x-y)
+    # print(f'diff full: {diff_full.shape}')
+    # print(f'diff_full: {diff_full}')
+        # print(f'diffmax: {np.max(np.abs(x-y))}')
     return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
 
 
@@ -43,6 +49,8 @@ def eval_numerical_gradient_array(f, x, df, h=1e-5):
     array and returns a numpy array.
     """
     grad = np.zeros_like(x)
+    # print(f'df shape: {df.shape}')
+    # print(f'x shape: {x.shape}')
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         ix = it.multi_index
