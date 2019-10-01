@@ -154,7 +154,8 @@ class fc(object):
         # Store the results in the variable output provided above.                  #
         #############################################################################
 
-        output = feat @ self.params[self.w_name] + self.params[self.b_name]
+        output = self.params[self.w_name].T @ feat.T + np.expand_dims(self.params[self.b_name], axis=1)
+        output = output.T
 
         #############################################################################
         #                             END OF YOUR CODE                              #
@@ -179,22 +180,23 @@ class fc(object):
         #############################################################################
 
         batch_size = self.meta.shape[0]
-        expanded_dprev = np.expand_dims(dprev, axis = 1)
-        dprev_dfeat = np.repeat(np.expand_dims(self.params[self.w_name].T, axis=0), batch_size, axis = 0)
-        dfeat = np.squeeze(expanded_dprev @ dprev_dfeat)
+        # expanded_dprev = np.expand_dims(dprev, axis = 1)
+        # dprev_dfeat = np.repeat(np.expand_dims(self.params[self.w_name].T, axis=0), batch_size, axis = 0)
+        # dfeat = np.squeeze(expanded_dprev @ dprev_dfeat)
+        #
+        # expanded_feat = np.expand_dims(feat, axis=2)
+        # dl_dw = expanded_dprev*expanded_feat
+        # dl_dw = np.sum(dl_dw, axis = 0)
+        # self.grads[self.w_name] = dl_dw
 
-        expanded_feat = np.expand_dims(feat, axis=2)
-        dl_dw = expanded_dprev*expanded_feat
-        dl_dw = np.sum(dl_dw, axis = 0)
-        self.grads[self.w_name] = dl_dw
-
+        self.grads[self.w_name] = np.dot(dprev.T, feat).T
+        dfeat = np.dot(self.params[self.w_name], dprev.T).T
         self.grads[self.b_name] = np.sum(dprev, axis=0)
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
         self.meta = None
         return dfeat
-
 
 class relu(object):
     def __init__(self, name="relu"):
@@ -283,8 +285,10 @@ class dropout(object):
             else:
                 kept = np.ones(shape=feat.shape)
         else:
-            kept = np.ones(shape=feat.shape)*self.keep_prob
-        output = kept * feat
+            kept = np.ones(shape=feat.shape)
+        output = (kept * feat)
+        if(self.keep_prob>0 and is_training):
+            output /= self.keep_prob
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################
@@ -305,11 +309,11 @@ class dropout(object):
         #############################################################################
         if(self.is_training):
             if(self.keep_prob>0):
-                dfeat = self.kept*dprev
+                dfeat = (self.kept*dprev)/self.keep_prob
             else:
                 dfeat = dprev
         else:
-            dfeat = dprev*self.keep_prob
+            dfeat = dprev
         #############################################################################
         #                             END OF YOUR CODE                              #
         #############################################################################

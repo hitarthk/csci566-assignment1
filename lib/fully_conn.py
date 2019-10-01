@@ -70,7 +70,7 @@ class TinyNet(Module):
         """ Some comments """
         self.net = sequential(
             ########## TODO: ##########
-            flatten(), fc(3072, 64, name='fc1'), relu('r1'), fc(64, 10, name='fc2')
+            flatten(), fc(3072, 110, name='fc1'), relu('r1'), fc(110, 10, name='fc3')
             ########### END ###########
         )
 

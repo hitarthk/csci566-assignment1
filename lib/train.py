@@ -195,6 +195,7 @@ def train_net(data, model, loss_func, optimizer, batch_size, max_epochs,
             #############################################################################
 
             model.net.gather_params()
+            opt_params = model.net.params
 
             #############################################################################
             #                             END OF YOUR CODE                              #
